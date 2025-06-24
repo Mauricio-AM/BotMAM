@@ -115,4 +115,4 @@ async def _bot(ctx):
     await ctx.send('Yes, the bot is cool.')
 
 # Ejecuta el bot con tu token (¡reemplaza esto con tu token real!)
-bot.run("MTM3OTI2NjE0ODkwNjA0MTQ1Ng.GtNsav.n5axQex02ZLewzludVV-PFi4LtYFz_I2Yihi-w")
+bot.run("Ingresar Token")
