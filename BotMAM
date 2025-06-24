@@ -1,0 +1,118 @@
+import discord
+from discord.ext import commands
+import random
+
+# Descripción del bot
+description = '''Bot de ejemplo que también da consejos ecológicos y manualidades.'''
+
+# Configuración de los "intents", necesarios para acceder a ciertos datos como contenido de mensajes
+intents = discord.Intents.default()
+intents.members = True  # Permite acceder a los miembros del servidor
+intents.message_content = True  # Permite leer el contenido de los mensajes
+
+# Crear una instancia del bot
+bot = commands.Bot(command_prefix='?', description=description, intents=intents)
+
+# Lista de consejos ambientales para responder cuando alguien escriba #consejos
+consejos = [
+    "♻️ Recicla correctamente (papel, plástico, vidrio, metal).",
+    "🌱 Composta residuos orgánicos para reducir basura que va al vertedero.",
+    "🚫 Evita productos de un solo uso como cubiertos plásticos y platos desechables.",
+    "🛍️ Compra a granel y lleva tus propios envases o bolsas reutilizables.",
+    "💡 Apaga luces y electrodomésticos cuando no los uses.",
+    "🔌 Desconecta cargadores que no estés utilizando.",
+    "☀️ Aprovecha la luz natural durante el día.",
+    "💧 Cierra la llave al cepillarte los dientes o lavar platos.",
+    "🚿 Instala economizadores de agua en grifos y duchas.",
+    "🌿 Reutiliza agua (por ejemplo, para regar plantas).",
+    "📦 Evita productos con muchos empaques, especialmente los no reciclables.",
+    "🚶‍♂️ Camina o usa bicicleta para trayectos cortos.",
+    "🚗 Comparte el auto o usa transporte público cuando salgas.",
+    "🏡 Teletrabaja si es posible.",
+]
+
+# Lista de ideas de manualidades con plástico para responder cuando alguien escriba #manualidades
+manualidades = [
+    "🧴 Haz una maceta con una botella de plástico cortada y decorada.",
+    "💡 Transforma botellas en lámparas colgantes o faroles creativos.",
+    "🎨 Crea flores decorativas usando cucharas plásticas y pinturas.",
+    "📦 Fabrica organizadores de escritorio con botellas o envases de plástico.",
+    "🐷 Haz una alcancía con botellas pequeñas y tapa de rosca.",
+    "🚗 Usa tapitas para hacer autos o figuras de juguete.",
+    "📱 Crea un soporte para celular con una botella recortada.",
+    "🎁 Haz envoltorios o cajas de regalo recicladas con botellas decoradas.",
+    "🎠 Crea móviles colgantes con formas de plástico recortado.",
+    "🖼️ Usa botellas planas para hacer marcos de fotos originales."
+]
+
+# Evento que se ejecuta cuando el bot está listo y conectado
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    print('------')
+
+# Evento que se activa cada vez que alguien manda un mensaje en un canal
+@bot.event
+async def on_message(message):
+    # Evitar que el bot se responda a sí mismo
+    if message.author == bot.user:
+        return
+
+    # Si el mensaje contiene "#consejos", se elige un consejo aleatorio y se envía
+    if '#consejos' in message.content.lower():
+        consejo = random.choice(consejos)
+        await message.channel.send(f'🌎 Consejo ecológico:\n{consejo}')
+
+    # Si el mensaje contiene "#manualidades", se elige una idea aleatoria y se envía
+    if '#manualidades' in message.content.lower():
+        idea = random.choice(manualidades)
+        await message.channel.send(f'🎨 Idea de manualidad casera:\n{idea}')
+
+    # Esto permite que los comandos registrados sigan funcionando
+    await bot.process_commands(message)
+
+# Comando que suma dos números
+@bot.command()
+async def add(ctx, left: int, right: int):
+    await ctx.send(left + right)
+
+# Comando que simula lanzar dados en formato NdN (por ejemplo, 2d6)
+@bot.command()
+async def roll(ctx, dice: str):
+    try:
+        rolls, limit = map(int, dice.split('d'))
+    except Exception:
+        await ctx.send('Format has to be in NdN!')
+        return
+    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
+    await ctx.send(result)
+
+# Comando que elige aleatoriamente entre varias opciones
+@bot.command()
+async def choose(ctx, *choices: str):
+    await ctx.send(random.choice(choices))
+
+# Comando que repite un mensaje varias veces
+@bot.command()
+async def repeat(ctx, times: int, content='repeating...'):
+    for i in range(times):
+        await ctx.send(content)
+
+# Comando que muestra cuándo un miembro se unió al servidor
+@bot.command()
+async def joined(ctx, member: discord.Member):
+    await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}')
+
+# Grupo de comandos que responde si algo o alguien es "cool"
+@bot.group()
+async def cool(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send(f'No, {ctx.subcommand_passed} is not cool')
+
+# Subcomando del grupo "cool"
+@cool.command(name='bot')
+async def _bot(ctx):
+    await ctx.send('Yes, the bot is cool.')
+
+# Ejecuta el bot con tu token (¡reemplaza esto con tu token real!)
+bot.run("MTM3OTI2NjE0ODkwNjA0MTQ1Ng.GtNsav.n5axQex02ZLewzludVV-PFi4LtYFz_I2Yihi-w")
